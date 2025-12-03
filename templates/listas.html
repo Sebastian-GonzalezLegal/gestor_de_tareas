@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listas de tareas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="top-header">
+        <div class="top-header-title">
+            <span class="app-logo">✓</span>
+            <h1>Listas de tareas</h1>
+        </div>
+        <a href="{{ url_for('vista_tareas', lista='general') }}" class="link-secundario">Ir a tareas</a>
+    </header>
+
+    <section class="seccion-crear-lista">
+        <h2>Nueva lista</h2>
+        <form method="POST" action="{{ url_for('crear_lista') }}" class="form-nueva-lista-completa">
+            <input type="text" name="nombre" placeholder="Nombre de la nueva lista" required>
+            <button type="submit" class="btn btn-principal">Crear</button>
+        </form>
+    </section>
+
+    <section class="seccion-listas">
+        {% if listas %}
+            <div class="listas-grid">
+                {% for lista in listas %}
+                    <article class="lista-card">
+                        <header class="lista-card-header">
+                            <h3>{{ lista.nombre }}</h3>
+                            <span class="badge-estado">{{ lista.total }} tareas</span>
+                        </header>
+                        <p class="lista-resumen">
+                            {% if lista.tema %}
+                                {% set tema_icono = '⭐' %}
+                                {% if lista.tema == 'compras' %}{% set tema_icono = '🛒' %}
+                                {% elif lista.tema == 'gym' %}{% set tema_icono = '💪' %}
+                                {% elif lista.tema == 'tareas' %}{% set tema_icono = '✅' %}
+                                {% elif lista.tema == 'trabajo' %}{% set tema_icono = '💼' %}
+                                {% elif lista.tema == 'estudio' %}{% set tema_icono = '📚' %}
+                                {% elif lista.tema == 'viajes' %}{% set tema_icono = '✈️' %}
+                                {% elif lista.tema == 'personal' %}{% set tema_icono = '🏠' %}
+                                {% endif %}
+                                Tema: {{ tema_icono }} {{ lista.tema }} ·
+                            {% endif %}
+                            Activas: {{ lista.activas }} · Completadas: {{ lista.completadas }}
+                        </p>
+                        <div class="lista-acciones">
+                            <a href="{{ url_for('vista_tareas', lista=lista.nombre) }}" class="btn btn-secundario">Ver tareas</a>
+                            {% if lista.nombre != 'general' %}
+                                <form method="POST" action="{{ url_for('renombrar_lista', lista_nombre=lista.nombre) }}">
+                                    <input type="text" name="nuevo_nombre" placeholder="Nuevo nombre" required>
+                                    <button type="submit" class="btn btn-secundario btn-pequeno">Renombrar</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('eliminar_lista', lista_nombre=lista.nombre) }}">
+                                    <button type="submit" class="btn btn-peligro btn-pequeno">Eliminar</button>
+                                </form>
+                            {% else %}
+                                <span class="acciones-deshabilitadas">La lista general no se puede eliminar</span>
+                            {% endif %}
+                        </div>
+                        <form method="POST" action="{{ url_for('actualizar_tema_lista', lista_nombre=lista.nombre) }}" class="form-tema-lista">
+                            <label for="tema-{{ loop.index }}" class="label-tema">Tema:</label>
+                            <select id="tema-{{ loop.index }}" name="tema" class="select-tema">
+                                <option value="" {% if not lista.tema %}selected{% endif %}>Sin tema</option>
+                                <option value="compras" {% if lista.tema == 'compras' %}selected{% endif %}>🛒 Compras</option>
+                                <option value="gym" {% if lista.tema == 'gym' %}selected{% endif %}>💪 Rutina de gym</option>
+                                <option value="tareas" {% if lista.tema == 'tareas' %}selected{% endif %}>✅ Lista de tareas</option>
+                                <option value="trabajo" {% if lista.tema == 'trabajo' %}selected{% endif %}>💼 Trabajo</option>
+                                <option value="estudio" {% if lista.tema == 'estudio' %}selected{% endif %}>📚 Estudio</option>
+                                <option value="viajes" {% if lista.tema == 'viajes' %}selected{% endif %}>✈️ Viajes</option>
+                                <option value="personal" {% if lista.tema == 'personal' %}selected{% endif %}>🏠 Personal</option>
+                                <option value="otro" {% if lista.tema == 'otro' %}selected{% endif %}>⭐ Otro</option>
+                            </select>
+                            <button type="submit" class="btn btn-secundario btn-pequeno">Guardar tema</button>
+                        </form>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No hay listas aún.</p>
+        {% endif %}
+    </section>
+</body>
+</html>
+
+

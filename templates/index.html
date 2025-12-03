@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de tareas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="top-header">
+        <div class="top-header-title">
+            <span class="app-logo">✓</span>
+            <h1>Lista: {{ lista_actual }}</h1>
+        </div>
+        <a href="{{ url_for('index') }}" class="link-secundario">Ver todas las listas</a>
+    </header>
+
+    <div class="selector-listas">
+        <form method="GET" action="{{ url_for('vista_tareas') }}" class="form-select-lista">
+            <label for="lista">Lista actual:</label>
+            <select id="lista" name="lista">
+                {% for nombre in listas %}
+                    <option value="{{ nombre }}" {% if nombre == lista_actual %}selected{% endif %}>
+                        {{ nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-secundario btn-pequeno">Cambiar</button>
+        </form>
+        <form method="GET" action="{{ url_for('vista_tareas') }}" class="form-nueva-lista">
+            <input type="text" name="lista" placeholder="Nueva lista..." required>
+            <button type="submit" class="btn btn-principal btn-pequeno">Crear / Ir</button>
+        </form>
+    </div>
+
+    {% if tema_lista %}
+        {% set tema_icono = '⭐' %}
+        {% if tema_lista == 'compras' %}{% set tema_icono = '🛒' %}
+        {% elif tema_lista == 'gym' %}{% set tema_icono = '💪' %}
+        {% elif tema_lista == 'tareas' %}{% set tema_icono = '✅' %}
+        {% elif tema_lista == 'trabajo' %}{% set tema_icono = '💼' %}
+        {% elif tema_lista == 'estudio' %}{% set tema_icono = '📚' %}
+        {% elif tema_lista == 'viajes' %}{% set tema_icono = '✈️' %}
+        {% elif tema_lista == 'personal' %}{% set tema_icono = '🏠' %}
+        {% endif %}
+        <p class="tema-actual">Tema de esta lista: <strong>{{ tema_icono }} {{ tema_lista }}</strong></p>
+    {% endif %}
+
+    <form class="form-nueva-tarea" method="POST" action="{{ url_for('ruta_agregar_tarea', lista=lista_actual) }}">
+        <input type="text" name="texto" placeholder="Escribe una nueva tarea..." required>
+        <button type="submit" class="btn btn-principal">Agregar</button>
+    </form>
+
+    {% if tareas %}
+        <ul class="lista-tareas">
+            {% for tarea in tareas %}
+                <li class="tarea-item {% if tarea['inhabilitada'] %}tarea-inhabilitada{% endif %}">
+                    <div class="tarea-contenido">
+                        <div class="tarea-titulo">
+                            <span class="estado-icono">
+                                {% if tarea['inhabilitada'] %}
+                                    🚫
+                                {% elif tarea['completada'] %}
+                                    ✅
+                                {% else %}
+                                    ⬜
+                                {% endif %}
+                            </span>
+            <span class="texto-tarea {% if tarea['completada'] %}completada{% endif %}">
+                                [{{ loop.index }}] {{ tarea['texto'] }}
+                            </span>
+                            <span class="badge-estado">
+                                {% if tarea['inhabilitada'] %}
+                                    Inhabilitada
+                                {% elif tarea['completada'] %}
+                                    Completada
+                                {% else %}
+                                    Incompleta
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if tarea['motivo'] %}
+                            <div class="motivo">
+                                <strong>Motivo:</strong> {{ tarea['motivo'] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="acciones">
+                        {% if not tarea['inhabilitada'] %}
+                            {% if not tarea['completada'] %}
+                                <form method="POST" action="{{ url_for('ruta_completar_tarea', tarea_id=tarea['id'], lista=lista_actual) }}">
+                                    <button type="submit" class="btn btn-principal">Completar</button>
+                                </form>
+                            {% else %}
+                                <form method="POST" action="{{ url_for('ruta_marcar_incompleta', tarea_id=tarea['id'], lista=lista_actual) }}">
+                                    <input type="text" name="motivo" class="input-motivo" placeholder="Motivo (opcional)">
+                                    <button type="submit" class="btn btn-secundario">Marcar incompleta</button>
+                                </form>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('ruta_borrar_tarea', tarea_id=tarea['id'], lista=lista_actual) }}">
+                                <button type="submit" class="btn btn-peligro">Borrar</button>
+                            </form>
+                        {% else %}
+                            <span class="acciones-deshabilitadas">Acciones deshabilitadas</span>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay tareas aún.</p>
+    {% endif %}
+</body>
+</html>
+
+

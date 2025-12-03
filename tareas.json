@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "texto": "prueba",
+    "completada": false,
+    "motivo": "no habia",
+    "inhabilitada": true,
+    "lista": "general",
+    "tema": "gym"
+  },
+  {
+    "id": 2,
+    "texto": "a",
+    "completada": true,
+    "motivo": "",
+    "inhabilitada": true,
+    "lista": "general",
+    "tema": "gym"
+  },
+  {
+    "id": 3,
+    "texto": "hola",
+    "completada": false,
+    "motivo": "",
+    "inhabilitada": true,
+    "lista": "general",
+    "tema": "gym"
+  },
+  {
+    "id": 4,
+    "texto": "hola",
+    "completada": true,
+    "motivo": "",
+    "inhabilitada": true,
+    "lista": "test",
+    "tema": "estudio"
+  },
+  {
+    "id": 5,
+    "texto": "hola",
+    "completada": false,
+    "motivo": "",
+    "inhabilitada": false,
+    "lista": "test",
+    "tema": "estudio"
+  }
+]
